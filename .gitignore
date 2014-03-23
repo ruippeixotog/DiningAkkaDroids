@@ -1,7 +1,6 @@
-lib_managed
-project/boot
-project/plugins/target
-project/plugins/src_managed
-project/plugins/lib_managed
-project/build/target
-target
+# project output directory
+target/
+
+# system and IDE setting files
+.DS_Store
+.idea

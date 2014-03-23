@@ -1,9 +1,9 @@
 package akka.android
 
-import _root_.android.app.Activity
-import _root_.android.os.Bundle
-import _root_.android.widget.TextView
-import _root_.android.content.Context
+import akka.actor.ActorSystem
+import android.app.Activity
+import android.content.Context
+import android.os.Bundle
 import java.io._
 import TypedResource._
 
@@ -29,6 +29,9 @@ case class Hakker(name: String, activity: MainActivity, left: TypedResource[andr
 }
 
 class MainActivity extends Activity {
+
+  var actorSystem = Option.empty[ActorSystem]
+
   override def onCreate(savedInstanceState: Bundle) = {
     super.onCreate(savedInstanceState)
     setContentView(R.layout.mainlayout)
@@ -40,20 +43,20 @@ class MainActivity extends Activity {
     """
     val stream = openFileOutput("akka.conf", Context.MODE_PRIVATE)
     stream.write(akka_conf.getBytes)
-    stream.close
-    
+    stream.close()
+
     System.setProperty("akka.config", new File(getFilesDir, "akka.conf").getAbsolutePath)
-    
+
     val imgHandles = List((TR.hakker1left, TR.hakker1right), (TR.hakker2left, TR.hakker2right), (TR.hakker5left, TR.hakker5right), (TR.hakker3left, TR.hakker3right), (TR.hakker4left, TR.hakker4right))
     val hakkers = for (
       (name, i) <- List("Jonas", "Viktor", "Debasish", "Martin", "Irmo").zipWithIndex
     ) yield Hakker(name, this, imgHandles(i)._1, imgHandles(i)._2)
 
-    DiningHakkersOnFsm.run(hakkers)
+    actorSystem = Some(DiningHakkersOnFsm.run(hakkers))
   }
-  
-  override def onStop = {
-    akka.actor.Actor.registry.shutdownAll
-    super.onStop
+
+  override def onStop() = {
+    actorSystem.foreach(_.shutdown())
+    super.onStop()
   }
 }
