@@ -12,6 +12,6 @@ scalaVersion := "2.10.3"
 
 platformName := "android-15"
 
-libraryDependencies += "com.typesafe.akka"             %% "akka-actor"              % "2.2.3"
+libraryDependencies += "com.typesafe.akka"             %% "akka-actor"              % "2.3.0"
 
 proguardOptions += Source.fromFile("project/proguard.cfg").mkString
